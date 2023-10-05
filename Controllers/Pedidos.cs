@@ -126,6 +126,8 @@ namespace API_AppCobranca.Controllers
                     from p in pGroup.DefaultIfEmpty()
                     join sv in _dbContext.TblSitefVenda on pz.CupomTef equals sv.CupomFiscal into svGroup
                     from sv in svGroup.DefaultIfEmpty()
+                    join pp in _dbContext.TblPrePedidos on pz.Codprepedido equals pp.Codprepedido into ppGroup
+                    from pp in ppGroup.DefaultIfEmpty()
                     let qtdpedido = (
                         from pz2 in _dbContext.TblParcelasPrazos
                         join p2 in _dbContext.TblPedidos on pz2.Codpedido equals p2.Codpedido
@@ -148,13 +150,15 @@ namespace API_AppCobranca.Controllers
                         vencimento = pz.Vencimento,
                         valor = pz.Valor,
                         pago = pz.Pago,
-                        atraso = pz.Pago == 'N' && pz.Vencimento.HasValue &&
-                                 new DateTime(pz.Vencimento.Value.Year, pz.Vencimento.Value.Month, pz.Vencimento.Value.Day) < DateTime.Today ?
-                                 (double)(DateTime.Today - new DateTime(pz.Vencimento.Value.Year, pz.Vencimento.Value.Month, pz.Vencimento.Value.Day)).TotalDays : 0,
+                        atraso = pz.Pago == 'S' ?
+                                 (int)(pz.Datapgto.Value - new DateTime(pz.Vencimento.Value.Year, pz.Vencimento.Value.Month, pz.Vencimento.Value.Day)).TotalDays :
+                                 (int)(DateTime.Today - new DateTime(pz.Vencimento.Value.Year, pz.Vencimento.Value.Month, pz.Vencimento.Value.Day)).TotalDays,
                         qtdpedido = qtdpedido,
-                        valorgasto = valorgasto ?? 0
+                        valorgasto = valorgasto ?? 0,
+                        nomecliente = pp.Cliente
                     }
                 ).OrderByDescending(h => h.vencimento).ToListAsync();
+
 
                 return Ok(historico);
             }

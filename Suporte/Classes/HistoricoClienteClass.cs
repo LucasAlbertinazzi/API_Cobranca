@@ -10,5 +10,6 @@
         public Double? atraso { get; set; }
         public int? qtdpedido { get; set; }
         public Decimal? valorgasto { get; set; }
+        public string? nomecliente { get; set; }
     }
 }
