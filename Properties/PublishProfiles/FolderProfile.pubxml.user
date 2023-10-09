@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>G:\Marcius\APP\API_COBRANCA\bin\Release\net7.0\publish\</_PublishTargetUrl>
+    <History>True|2023-10-07T14:38:36.7517939Z;True|2023-10-06T14:24:47.6596139-03:00;True|2023-10-06T12:46:26.0922706-03:00;True|2023-10-06T12:46:02.1041882-03:00;True|2023-10-06T11:32:34.3339060-03:00;True|2023-10-06T10:23:47.2638178-03:00;True|2023-10-05T16:21:40.9457301-03:00;True|2023-10-05T14:59:46.5177968-03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>

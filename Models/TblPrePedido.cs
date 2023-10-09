@@ -8,6 +8,7 @@ public partial class TblPrePedido
     /// <summary>
     /// Codigo do Pré Pedido
     /// </summary>
+    /// 
     public int Codprepedido { get; set; }
 
     public int? Codcliente { get; set; }

@@ -1,6 +1,7 @@
 ﻿using API_AppCobranca.Models;
 using API_AppCobranca.Suporte;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp.Formats.Png;
 
 namespace API_AppCobranca.Controllers
@@ -53,6 +54,22 @@ namespace API_AppCobranca.Controllers
         }
 
         [HttpGet]
+        [Route("busca-cidade")]
+        public async Task<IActionResult> BuscaCidade(int codcidade)
+        {
+            try
+            {
+                var query = _dbContext.TblCidades.Where(x => x.Codcidade == codcidade).ToList();
+                return Ok(query[0].Cidade);
+
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        [HttpGet]
         [Route("foto-cliente")]
         public async Task<ActionResult> FotosClientes(string arquivo)
         {
@@ -84,6 +101,30 @@ namespace API_AppCobranca.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Erro interno: {ex.Message}"); // Retorna erro interno do servidor
+            }
+        }
+
+        [HttpPost]
+        [Route("solicita-contrato")]
+        public async Task<int> SolicitaContrato(int codprepedido)
+        {
+            try
+            {
+                var prepedido = await _dbContext.TblPrePedidos.FirstOrDefaultAsync(p => p.Codprepedido == codprepedido && p.Impresso == 'N');
+
+                if (prepedido != null)
+                {
+                    prepedido.SolContrato = 'S';
+
+                    return await _dbContext.SaveChangesAsync();
+                }
+
+                return 0;
+
+            }
+            catch (Exception)
+            {
+                return 0;
             }
         }
     }

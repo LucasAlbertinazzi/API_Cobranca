@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LEfA7+sYjDAB/rOW6dvQe5GjUpdz4p0cmlb+JiAyL5pHFzfqvMw7ZZKtoiDO7KQ5Go9R6mG3MVoknFnx0clikg==",
+  "dgSpecHash": "GU0036qfK1rA6n5+0xoDDC5mulRCK5Zy9iUH3LjneRHq39DPl4lTmaVCoLtvd4ASU4HMmd+dJnh5jiuOCnIfFA==",
   "success": true,
-  "projectFilePath": "G:\\Marcius\\APP\\ApiCobranca\\API_AppCobranca.csproj",
+  "projectFilePath": "G:\\Marcius\\APP\\API_COBRANCA\\API_AppCobranca.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\lucas\\.nuget\\packages\\bouncycastle\\1.8.9\\bouncycastle.1.8.9.nupkg.sha512",
     "C:\\Users\\lucas\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

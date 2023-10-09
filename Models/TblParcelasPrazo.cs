@@ -23,7 +23,7 @@ public partial class TblParcelasPrazo
 
     public long? Parcela { get; set; }
 
-    public DateOnly? Vencimento { get; set; }
+    public DateOnly Vencimento { get; set; }
 
     public decimal? Valor { get; set; }
 

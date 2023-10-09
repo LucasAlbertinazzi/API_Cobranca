@@ -1,9 +1,11 @@
 ﻿using API_AppCobranca.Models;
+using API_AppCobranca.Suporte.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Npgsql;
 using System.Data;
+using System.Net.Http;
 
 namespace API_AppCobranca.Controllers
 {
@@ -62,6 +64,22 @@ namespace API_AppCobranca.Controllers
 
 
             return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("verifica-ocorrencia")]
+        public async Task<IActionResult> VerificaOcorrencia(int codocorrencia)
+        {
+            try
+            {
+                bool result = await _dbContext.TblAnaliseCreditos.AnyAsync(x => x.Codsolicitacao == codocorrencia && x.Finalizado == true && x.Datasenha != null);
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest(false);
+            }
         }
 
         [HttpGet]
@@ -299,6 +317,98 @@ namespace API_AppCobranca.Controllers
                 return BadRequest(ex.Message);
             }
 
+        }
+
+        [HttpPost]
+        [Route("aprova-pedido")]
+        public async Task<IActionResult> AprovaPedido(TblPrePedido senhaPedido)
+        {
+            try
+            {
+                var _usuario = _dbContext.TblUsuarios.Where(x => x.Codusuario == senhaPedido.Codusuario).ToList();
+
+                // Atualiza tbl_pre_pedido
+                var prePedido = await _dbContext.TblPrePedidos
+                    .Where(p => p.Codprepedido == senhaPedido.Codprepedido)
+                    .FirstOrDefaultAsync();
+
+                if (prePedido != null)
+                {
+                    prePedido.OcorrDesc = 0;
+                    prePedido.Senha2 = _usuario[0].Usuario;
+                    prePedido.Horasenha2 = senhaPedido.Horasenha2;
+                    prePedido.Senha2obs = senhaPedido.Senha2obs;
+
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                // Atualiza tbl_analise_credito
+                var analiseCredito = await _dbContext.TblAnaliseCreditos
+                    .Where(ac => Convert.ToInt32(ac.Codigo) == senhaPedido.Codprepedido &&
+                                 ac.Tiposenha == 1 &&
+                                 ac.Codcliente == senhaPedido.Codcliente)
+                    .FirstOrDefaultAsync();
+
+                if (analiseCredito != null)
+                {
+                    analiseCredito.Datasenha = DateTime.Now;
+                    analiseCredito.Analista = senhaPedido.Codusuario;
+                    analiseCredito.Finalizado = true;
+
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("negar-pedido")]
+        public async Task<IActionResult> NegarPedido(TblPrePedido senhaPedido)
+        {
+            try
+            {
+                var _usuario = _dbContext.TblUsuarios.Where(x => x.Codusuario == senhaPedido.Codusuario).ToList();
+
+                var senhaNegada = new TblSenhaNegadum
+                {
+                    Codcliente = senhaPedido.Codcliente,
+                    Usuario = _usuario[0].Usuario,
+                    Motivo = senhaPedido.Senha2obs,
+                    Data = DateTime.Now,
+                    Senha = '2'
+                };
+
+                await _dbContext.TblSenhaNegada.AddAsync(senhaNegada);
+
+                // Atualiza tbl_analise_credito
+                var analiseCredito = await _dbContext.TblAnaliseCreditos
+                    .Where(ac => Convert.ToInt32(ac.Codigo) == senhaPedido.Codprepedido &&
+                                 ac.Tiposenha == 1 &&
+                                 ac.Codcliente == senhaPedido.Codcliente)
+                    .FirstOrDefaultAsync();
+
+                if (analiseCredito != null)
+                {
+                    analiseCredito.Datasenha = DateTime.Now;
+                    analiseCredito.Analista = senhaPedido.Codusuario;
+                    analiseCredito.Finalizado = true;
+
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
     }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "G:\\Marcius\\APP\\ApiCobranca\\API_AppCobranca.csproj": {}
+    "G:\\Marcius\\APP\\API_COBRANCA\\API_AppCobranca.csproj": {}
   },
   "projects": {
-    "G:\\Marcius\\APP\\ApiCobranca\\API_AppCobranca.csproj": {
+    "G:\\Marcius\\APP\\API_COBRANCA\\API_AppCobranca.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "G:\\Marcius\\APP\\ApiCobranca\\API_AppCobranca.csproj",
+        "projectUniqueName": "G:\\Marcius\\APP\\API_COBRANCA\\API_AppCobranca.csproj",
         "projectName": "API_AppCobranca",
-        "projectPath": "G:\\Marcius\\APP\\ApiCobranca\\API_AppCobranca.csproj",
+        "projectPath": "G:\\Marcius\\APP\\API_COBRANCA\\API_AppCobranca.csproj",
         "packagesPath": "C:\\Users\\lucas\\.nuget\\packages\\",
-        "outputPath": "G:\\Marcius\\APP\\ApiCobranca\\obj\\",
+        "outputPath": "G:\\Marcius\\APP\\API_COBRANCA\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

@@ -11,11 +11,50 @@ namespace API_AppCobranca.Controllers
     public class ScoreBoaVista : ControllerBase
     {
         private readonly DbmarciusbrtsSemanalContext _dbContext;
-        private readonly ScoreSup _scoreSup = new ScoreSup();
+        private readonly ScoreSup _scoreSup;
 
         public ScoreBoaVista(DbmarciusbrtsSemanalContext dbContext)
         {
             _dbContext = dbContext;
+            _scoreSup = new ScoreSup(_dbContext);
+        }
+
+        [HttpGet]
+        [Route("last-score")]
+        public async Task<IActionResult> LastScore(int codcliente, string tipo)
+        {
+            try
+            {
+                var consulta = await (from spc in _dbContext.TblSpcSerasas
+                                      join usuario in _dbContext.TblUsuarios on spc.Codusuario equals usuario.Codusuario
+                                      where spc.Codcliente == codcliente &&
+                                            spc.Tipo == tipo &&
+                                            spc.Excluido != 'S' &&
+                                            spc.Situacao != null
+                                      orderby spc.Codigo descending
+                                      select new
+                                      {
+                                          spc.Codigo,
+                                          spc.Informante,
+                                          spc.Situacao,
+                                          Usuario = usuario.Usuario,
+                                          spc.Dataconsulta,
+                                          Pdflast = spc.Informacao
+                                      }).Take(1).FirstOrDefaultAsync();
+
+                if (consulta != null)
+                {
+                    return Ok(consulta);
+                }
+                else
+                {
+                    return NotFound("Nenhum resultado encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
@@ -44,11 +83,11 @@ namespace API_AppCobranca.Controllers
             {
                 var itens = new TblSpcSerasa
                 {
-                    Codcliente = Convert.ToInt64(infoGravaSpc.codcliente),
+                    Codcliente = infoGravaSpc.codcliente,
                     Informante = infoGravaSpc.informante,
                     Dataconsulta = DateTime.Now,
                     Tipo = infoGravaSpc.tipos,
-                    Codusuario = Convert.ToInt32(infoGravaSpc.codusuario),
+                    Codusuario = infoGravaSpc.codusuario,
                     Situacao = infoGravaSpc.situacao,
                     Informacao = infoGravaSpc.informacao
                 };

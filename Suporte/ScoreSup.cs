@@ -10,6 +10,13 @@ namespace API_AppCobranca.Suporte
 {
     public class ScoreSup
     {
+        private readonly DbmarciusbrtsSemanalContext _dbContext;
+
+        public ScoreSup(DbmarciusbrtsSemanalContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         private Socket Conn;
         private ArrayList resultadoConsulta = new ArrayList();
 
@@ -314,8 +321,7 @@ namespace API_AppCobranca.Suporte
 
         public async Task GravaConsSpcAuto(InfoScore infoGravaSpc)
         {
-            DbmarciusbrtsSemanalContext dbContext = new DbmarciusbrtsSemanalContext();
-            ScoreBoaVista scoreBoaVista = new ScoreBoaVista(dbContext);
+            ScoreBoaVista scoreBoaVista = new ScoreBoaVista(_dbContext);
 
             await scoreBoaVista.Gravar(infoGravaSpc);
 
@@ -364,8 +370,8 @@ namespace API_AppCobranca.Suporte
 
         public class InfoScore
         {
-            public string? codusuario { get; set; }
-            public string? codcliente { get; set; }
+            public int? codusuario { get; set; }
+            public long? codcliente { get; set; }
             public string? tipos { get; set; }
             public string? codigo { get; set; }
             public string? senha { get; set; }
