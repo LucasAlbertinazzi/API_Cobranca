@@ -3,6 +3,7 @@
     public class HistoricoClienteClass
     {
         public string? codpedido { get; set; }
+        public long? prepedido { get; set; }
         public DateOnly? vencimento { get; set; }
         public Decimal? valor { get; set; }
         public Decimal? valorpago { get; set; }

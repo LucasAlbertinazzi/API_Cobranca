@@ -1,8 +1,10 @@
 ﻿using API_AppCobranca.Models;
 using API_AppCobranca.Suporte;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp.Formats.Png;
+using System.Linq;
 
 namespace API_AppCobranca.Controllers
 {
@@ -17,6 +19,80 @@ namespace API_AppCobranca.Controllers
         public Clientes(DbmarciusbrtsSemanalContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        [HttpGet]
+        [Route("busca-cliente-tipo")]
+        public async Task<IActionResult> BuscaClienteTipo(string texto, string tipo, string tipoCliente)
+        {
+            try
+            {
+                var query = from usuario in _dbContext.TblUsuarios
+                            join cliente in _dbContext.TblClientes on usuario.Codusuario equals cliente.Codusuario
+                            select new
+                            {
+                                Cliente = cliente,
+                                Usuario = usuario.Usuario,
+                                BairroCliente = cliente.Codbairro.HasValue ? _dbContext.GetBairro(cliente.Codbairro.Value) : null,
+                                CidadeCliente = cliente.Codcidade.HasValue ? _dbContext.GetCidade(cliente.Codcidade.Value) : null,
+                                BairroEmpresa = cliente.EmpreCodbairro.HasValue ? _dbContext.GetBairro(cliente.EmpreCodbairro.Value) : null,
+                                CidadeEmpresa = cliente.EmpreCodcidade.HasValue ? _dbContext.GetCidade(cliente.EmpreCodcidade.Value) : null,
+                                BairroConjuje = cliente.CodbairroEmpConj.HasValue ? _dbContext.GetBairro(cliente.CodbairroEmpConj.Value) : null,
+                                CidadeConjuje = cliente.CodcidadeEmpConj.HasValue ? _dbContext.GetCidade(cliente.CodcidadeEmpConj.Value) : null,
+                                BairroCorrespondencia = cliente.CodbairroC.HasValue ? _dbContext.GetBairro(cliente.CodbairroC.Value) : null,
+                                CidadeCorrespondencia = cliente.CodcidadeC.HasValue ? _dbContext.GetCidade(cliente.CodcidadeC.Value) : null
+                            };
+
+                if(tipoCliente == "TITULAR")
+                {
+                    switch (tipo)
+                    {
+                        case "cpf":
+                            query = query.Where(q => q.Cliente.Cpf == texto);
+                            break;
+                        case "cnpj":
+                            query = query.Where(q => q.Cliente.Cnpj == texto);
+                            break;
+                        case "cliente":
+                            query = query.Where(q => q.Cliente.Nome == texto);
+                            break;
+                        case "codcliente":
+                            query = query.Where(q => q.Cliente.Codcliente == Convert.ToInt32(texto));
+                            break;
+                        default:
+                            // Tipo inválido, faça o tratamento apropriado aqui.
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (tipo)
+                    {
+                        case "cpf":
+                            query = query.Where(q => q.Cliente.ConjCpf == texto);
+                            break;
+                        case "cnpj":
+                            query = query.Where(q => q.Cliente.Cnpj == texto);
+                            break;
+                        case "cliente":
+                            query = query.Where(q => q.Cliente.Conjuge == texto);
+                            break;
+                        case "codcliente":
+                            query = query.Where(q => q.Cliente.Codcliente == Convert.ToInt32(texto));
+                            break;
+                        default:
+                            // Tipo inválido, faça o tratamento apropriado aqui.
+                            break;
+                    }
+                }
+
+                var result = query.FirstOrDefault();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         [HttpGet]
@@ -50,6 +126,28 @@ namespace API_AppCobranca.Controllers
             catch (Exception)
             {
                 return null;
+            }
+        }
+
+        [HttpGet]
+        [Route("busca-cliente-prcessado")]
+        public async Task<IActionResult> ClienteProcessado(int codcliente)
+        {
+            try
+            {
+                var query = _dbContext.TblCobrancaConts.Where(x => x.ClienteProcessado == true && x.Codcliente == codcliente).ToList();
+
+                if(query != null)
+                {
+                    return Ok(true);
+                }
+
+                return Ok(false);
+
+            }
+            catch (Exception)
+            {
+                return Ok(false);
             }
         }
 

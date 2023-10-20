@@ -173,6 +173,88 @@ namespace API_AppCobranca.Controllers
         }
 
         [HttpGet]
+        [Route("historico-pedidos-periodo")]
+        public async Task<ActionResult<List<HistoricoClienteClass>>> BuscaHistoricoClientePeriodo(long codcliente, string periodo)
+        {
+            try
+            {
+                string newPeriodo = string.Empty;
+                if (periodo.Contains("ANOS"))
+                {
+                    newPeriodo = periodo.Replace("ANOS", "");
+                    newPeriodo = newPeriodo.Replace(" ", "");
+                }
+                else
+                {
+                    newPeriodo = periodo.Replace("ANO", "");
+                    newPeriodo = newPeriodo.Replace(" ", "");
+                }
+
+                // Converter em int
+                int periodoInt = int.Parse(newPeriodo);
+
+                var doisAnosAtras = DateOnly.FromDateTime(DateTime.Today.AddYears(-periodoInt));
+                TimeOnly tempo = new TimeOnly(0, 0, 0);
+
+                var historico = await (
+                    from pz in _dbContext.TblParcelasPrazos
+                    where pz.Codcliente == codcliente
+                          && (pz.Forma == "DP" || pz.Forma == "CH")
+                          && pz.Codpedido != null
+                          && pz.Cancelado == 'N'
+                          && pz.Vencimento >= doisAnosAtras
+                    join c in _dbContext.TblClientes on pz.Codcliente equals c.Codcliente
+                    join p in _dbContext.TblPedidos on pz.Codpedido equals p.Codpedido into pGroup
+                    from p in pGroup.DefaultIfEmpty()
+                    join sv in _dbContext.TblSitefVenda on pz.CupomTef equals sv.CupomFiscal into svGroup
+                    from sv in svGroup.DefaultIfEmpty()
+                    join pp in _dbContext.TblPrePedidos on pz.Codprepedido equals pp.Codprepedido into ppGroup
+                    from pp in ppGroup.DefaultIfEmpty()
+
+                    let atraso = pz.Pago == 'N' && pz.Vencimento.ToDateTime(tempo) > DateTime.Today ? 0 :
+                        pz.Pago == 'N' && pz.Datapgto == null && pz.Vencimento.ToDateTime(tempo) < DateTime.Today ?
+                        (int)(DateTime.Today - pz.Vencimento.ToDateTime(tempo)).TotalDays :
+                        pz.Pago == 'S' && pz.Datapgto != null ?
+                        (int)((pz.Datapgto.Value - pz.Vencimento.ToDateTime(tempo)).TotalDays) : 0
+                    let qtdpedido = (
+                        from pz2 in _dbContext.TblParcelasPrazos
+                        join p2 in _dbContext.TblPedidos on pz2.Codpedido equals p2.Codpedido
+                        where pz2.Codcliente == codcliente
+                            && p2.Codpedido != null
+                            && p2.Cancelado == 'N'
+                        select p2.Codpedido
+                    ).Distinct().Count()
+                    let valorgasto = (
+                        from pz3 in _dbContext.TblParcelasPrazos
+                        where pz3.Codcliente == codcliente
+                            && pz3.Codpedido != null
+                            && pz3.Cancelado == 'N'
+                        select pz3.Valorpago
+                    ).Sum()
+                    select new HistoricoClienteClass
+                    {
+                        prepedido = pz.Codprepedido,
+                        codpedido = pz.Codpedido,
+                        valorpago = pz.Valorpago,
+                        vencimento = pz.Vencimento,
+                        valor = pz.Valor,
+                        pago = pz.Pago,
+                        atraso = atraso,
+                        qtdpedido = qtdpedido,
+                        valorgasto = valorgasto ?? 0,
+                        nomecliente = pp.Cliente
+                    }
+                ).OrderByDescending(h => h.vencimento).ToListAsync();
+
+                return Ok(historico);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
+        }
+
+        [HttpGet]
         [Route("busca-info-produtos-pedido")]
         public async Task<IActionResult> BuscaInfoProdutosPedido(string codigo)
         {
@@ -262,7 +344,6 @@ namespace API_AppCobranca.Controllers
                                 Pago = parcela.Pago.ToString(),
                                 ValorPago = parcela.Valorpago,
                                 DataPgto = parcela.Datapgto,
-                                Caixa = parcela.Caixa,
                                 Usuario = usuario.Usuario,
                                 Estornada = parcela.Estornada + " - Motivo: " + parcela.Motivoestorno,
                                 NumParcela = 0,
