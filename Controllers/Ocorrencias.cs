@@ -13,9 +13,9 @@ namespace API_AppCobranca.Controllers
     [ApiController]
     public class Ocorrencias : ControllerBase
     {
-        private readonly DbmarciusbrtsSemanalContext _dbContext;
+        private readonly DbContextApp _dbContext;
 
-        public Ocorrencias(DbmarciusbrtsSemanalContext dbContext)
+        public Ocorrencias(DbContextApp dbContext)
         {
             _dbContext = dbContext;
         }

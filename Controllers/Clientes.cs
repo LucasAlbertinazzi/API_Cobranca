@@ -14,9 +14,9 @@ namespace API_AppCobranca.Controllers
     {
         private string path = "\\\\192.168.10.14\\fileserver\\MATRIZ\\SISTEMA_LOJAS\\Imagens\\Fotosclientes\\";
 
-        private readonly DbmarciusbrtsSemanalContext _dbContext;
+        private readonly DbContextApp _dbContext;
 
-        public Clientes(DbmarciusbrtsSemanalContext dbContext)
+        public Clientes(DbContextApp dbContext)
         {
             _dbContext = dbContext;
         }

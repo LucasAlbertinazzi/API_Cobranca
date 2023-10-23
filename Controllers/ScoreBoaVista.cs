@@ -10,10 +10,10 @@ namespace API_AppCobranca.Controllers
     [ApiController]
     public class ScoreBoaVista : ControllerBase
     {
-        private readonly DbmarciusbrtsSemanalContext _dbContext;
+        private readonly DbContextApp _dbContext;
         private readonly ScoreSup _scoreSup;
 
-        public ScoreBoaVista(DbmarciusbrtsSemanalContext dbContext)
+        public ScoreBoaVista(DbContextApp dbContext)
         {
             _dbContext = dbContext;
             _scoreSup = new ScoreSup(_dbContext);

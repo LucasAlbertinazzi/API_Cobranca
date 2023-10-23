@@ -9,9 +9,9 @@ namespace API_AppCobranca.Controllers
     [ApiController]
     public class Pedidos : ControllerBase
     {
-        private readonly DbmarciusbrtsSemanalContext _dbContext;
+        private readonly DbContextApp _dbContext;
 
-        public Pedidos(DbmarciusbrtsSemanalContext dbContext)
+        public Pedidos(DbContextApp dbContext)
         {
             _dbContext = dbContext;
         }

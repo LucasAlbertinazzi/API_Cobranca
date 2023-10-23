@@ -16,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Adicionar o DbContext ao contêiner
-builder.Services.AddDbContext<DbmarciusbrtsSemanalContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<DbContextApp>(options => options.UseNpgsql(connectionString));
 
 var app = builder.Build();
 

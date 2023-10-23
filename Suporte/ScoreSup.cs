@@ -10,9 +10,9 @@ namespace API_AppCobranca.Suporte
 {
     public class ScoreSup
     {
-        private readonly DbmarciusbrtsSemanalContext _dbContext;
+        private readonly DbContextApp _dbContext;
 
-        public ScoreSup(DbmarciusbrtsSemanalContext dbContext)
+        public ScoreSup(DbContextApp dbContext)
         {
             _dbContext = dbContext;
         }

@@ -24,7 +24,7 @@ public partial class TblNfeEntradaArmazenagem
     public DateTime Data { get; set; }
 
     /// <summary>
-    /// codigo na tbl_nfe referente a nfe de armazem emitida pela marcius
+    /// codigo na tbl_nfe referente a nfe de armazem emitida pela AppEmpresarialMultFuncional
     /// </summary>
     public int? IdNfeArmazemMarcius { get; set; }
 }
